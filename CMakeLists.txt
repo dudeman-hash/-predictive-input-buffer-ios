@@ -13,4 +13,11 @@ endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
+# iOS only: Geode's generated bindings define the FMOD_* functions (FMOD is not linked on iOS)
+# but never include the FMOD header, so the bindings library fails with "unknown type name
+# 'FMOD_RESULT'". Include it for that library. Other platforms are not affected.
+if (CMAKE_SYSTEM_NAME STREQUAL "iOS" AND TARGET GeodeBindings)
+    target_compile_options(GeodeBindings PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:SHELL:-include fmod.hpp>")
+endif()
+
 setup_geode_mod(${PROJECT_NAME})
